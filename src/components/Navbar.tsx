@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Moon, Sun, Menu, X } from "lucide-react";
+import { Moon, Sun, Menu, X, LogOut, User as UserIcon } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { useAuth } from "@/hooks/use-auth";
 import logo from "@/assets/logo.png";
 
 const links = [
@@ -11,6 +13,7 @@ const links = [
 ];
 
 export function Navbar() {
+  const { user, signOut } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(true);
@@ -31,18 +34,16 @@ export function Navbar() {
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className={`fixed top-0 inset-x-0 z-50 transition-all ${
-        scrolled ? "py-2" : "py-4"
-      }`}
+      className={`fixed top-0 inset-x-0 z-50 transition-all ${scrolled ? "py-2" : "py-4"}`}
     >
       <div className="mx-auto max-w-7xl px-4">
         <div className={`glass rounded-2xl px-4 py-3 flex items-center justify-between transition-all ${scrolled ? "shadow-card" : ""}`}>
-          <a href="#home" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <img src={logo} alt="Pentol Berkah" className="h-9 w-9 rounded-lg object-contain" />
             <span className="font-display font-bold text-lg leading-none">
               Pentol <span className="text-gradient-flame">Berkah</span>
             </span>
-          </a>
+          </Link>
 
           <div className="hidden md:flex items-center gap-1">
             {links.map((l) => (
@@ -60,9 +61,23 @@ export function Navbar() {
             >
               {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            <a href="#menu" className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-flame text-primary-foreground font-semibold text-sm hover:scale-105 transition-transform glow-flame">
-              Pesan Sekarang
-            </a>
+
+            {user ? (
+              <div className="hidden md:flex items-center gap-2">
+                <div className="flex items-center gap-2 glass px-3 py-2 rounded-xl">
+                  <UserIcon className="h-4 w-4 text-primary" />
+                  <span className="text-xs font-medium max-w-[140px] truncate">{user.email}</span>
+                </div>
+                <button onClick={() => signOut()} className="h-10 w-10 grid place-items-center rounded-xl glass hover:glow-flame" aria-label="Sign out">
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <Link to="/auth" className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-flame text-primary-foreground font-semibold text-sm hover:scale-105 transition-transform glow-flame">
+                Masuk
+              </Link>
+            )}
+
             <button
               onClick={() => setOpen((o) => !o)}
               className="md:hidden h-10 w-10 grid place-items-center rounded-xl glass"
@@ -84,6 +99,15 @@ export function Navbar() {
                 {l.label}
               </a>
             ))}
+            {user ? (
+              <button onClick={() => signOut()} className="px-4 py-3 rounded-lg text-sm font-medium text-left flex items-center gap-2">
+                <LogOut className="h-4 w-4" /> Keluar
+              </button>
+            ) : (
+              <Link to="/auth" onClick={() => setOpen(false)} className="px-4 py-3 rounded-lg bg-gradient-flame text-primary-foreground text-sm font-semibold text-center">
+                Masuk / Daftar
+              </Link>
+            )}
           </motion.div>
         )}
       </div>
