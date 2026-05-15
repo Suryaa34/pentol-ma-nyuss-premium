@@ -10,6 +10,8 @@ import {
 
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/hooks/use-auth";
+import { CartProvider } from "@/hooks/use-cart";
+import { CartDrawer } from "@/components/CartDrawer";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
