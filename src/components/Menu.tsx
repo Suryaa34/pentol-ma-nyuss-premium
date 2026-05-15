@@ -144,11 +144,11 @@ export function Menu() {
                       Stok: <span className={`font-medium ${out ? "text-destructive" : "text-foreground"}`}>{out ? "Habis" : `${item.stock} pcs`}</span>
                     </p>
                     <button
-                      onClick={() => buy(item)}
-                      disabled={buyingId === item.id || out}
+                      onClick={() => openBuy(item)}
+                      disabled={out}
                       className="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-2xl bg-gradient-flame text-primary-foreground font-semibold hover:glow-flame transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
                     >
-                      {buyingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingBag className="h-4 w-4" />}
+                      <ShoppingBag className="h-4 w-4" />
                       {out ? "Stok Habis" : "Beli Sekarang"}
                     </button>
                   </div>
