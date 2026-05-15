@@ -6,6 +6,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCart, SAUCE_OPTIONS } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { CheckoutDialog, CheckoutForm } from "./CheckoutDialog";
 
 const formatRp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 
