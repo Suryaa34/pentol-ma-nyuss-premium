@@ -18,8 +18,20 @@ export function CartDrawer() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
 
-  const checkout = async () => {
+  const openCheckout = () => {
+    if (items.length === 0) return;
+    if (!user) {
+      toast.info("Silakan masuk untuk melanjutkan");
+      setOpen(false);
+      navigate({ to: "/auth" });
+      return;
+    }
+    setFormOpen(true);
+  };
+
+  const checkout = async (form: CheckoutForm) => {
     if (items.length === 0) return;
     if (!user) {
       toast.info("Silakan masuk untuk melanjutkan");
