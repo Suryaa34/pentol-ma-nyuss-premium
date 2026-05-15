@@ -200,16 +200,23 @@ export function CartDrawer() {
                   <span className="text-gradient-flame">{formatRp(total)}</span>
                 </div>
                 <button
-                  onClick={checkout}
+                  onClick={openCheckout}
                   disabled={submitting}
                   className="w-full py-3.5 rounded-2xl bg-gradient-flame text-primary-foreground font-semibold hover:glow-flame transition-all hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingBag className="h-4 w-4" />}
-                  Pesan Sekarang
+                  Lanjut Checkout
                 </button>
               </div>
             )}
           </motion.aside>
+          <CheckoutDialog
+            open={formOpen}
+            onClose={() => !submitting && setFormOpen(false)}
+            onSubmit={checkout}
+            total={total}
+            submitting={submitting}
+          />
         </>
       )}
     </AnimatePresence>
