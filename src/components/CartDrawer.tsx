@@ -43,7 +43,14 @@ export function CartDrawer() {
     try {
       const { data: order, error: oErr } = await supabase
         .from("orders")
-        .insert({ user_id: user.id, total, status: "pending" })
+        .insert({
+          user_id: user!.id,
+          total,
+          status: "pending",
+          buyer_name: form.buyerName,
+          buyer_whatsapp: form.buyerWhatsapp,
+          notes: form.notes,
+        })
         .select()
         .single();
       if (oErr) throw oErr;
@@ -59,7 +66,6 @@ export function CartDrawer() {
       const { error: iErr } = await supabase.from("order_items").insert(rows);
       if (iErr) throw iErr;
 
-      // decrement stock per menu_id
       const grouped = new Map<string, number>();
       items.forEach((i) => grouped.set(i.menuId, (grouped.get(i.menuId) ?? 0) + i.quantity));
       for (const [menuId, qty] of grouped) {
@@ -67,8 +73,9 @@ export function CartDrawer() {
         if (m) await supabase.from("menu").update({ stock: Math.max(0, m.stock - qty) }).eq("id", menuId);
       }
 
-      toast.success("Pesanan berhasil dibuat! 🔥");
+      toast.success(`Pesanan ${order.order_number ?? ""} berhasil dibuat! 🔥`);
       clear();
+      setFormOpen(false);
       setOpen(false);
     } catch (e: any) {
       toast.error(e.message ?? "Gagal checkout");
