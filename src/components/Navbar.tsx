@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Moon, Sun, Menu, X, LogOut, User as UserIcon } from "lucide-react";
+import { Moon, Sun, Menu, X, LogOut, User as UserIcon, ShoppingCart } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
+import { useCart } from "@/hooks/use-cart";
 import logo from "@/assets/logo.png";
 
 const links = [
