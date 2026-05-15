@@ -57,6 +57,18 @@ export function Navbar() {
 
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setCartOpen(true)}
+              className="relative h-10 w-10 grid place-items-center rounded-xl glass hover:glow-flame transition-all"
+              aria-label="Keranjang"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {count > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 h-5 min-w-5 px-1 grid place-items-center rounded-full bg-gradient-flame text-primary-foreground text-[10px] font-bold glow-flame">
+                  {count}
+                </span>
+              )}
+            </button>
+            <button
               onClick={() => setDark((d) => !d)}
               className="h-10 w-10 grid place-items-center rounded-xl glass hover:glow-flame transition-all"
               aria-label="Toggle theme"
