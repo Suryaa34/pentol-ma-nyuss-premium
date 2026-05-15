@@ -60,7 +60,9 @@ export type Database = {
           menu_id: string
           order_id: string
           quantity: number
+          sauces: string[]
           unit_price: number
+          with_broth: boolean
         }
         Insert: {
           created_at?: string
@@ -68,7 +70,9 @@ export type Database = {
           menu_id: string
           order_id: string
           quantity: number
+          sauces?: string[]
           unit_price: number
+          with_broth?: boolean
         }
         Update: {
           created_at?: string
@@ -76,7 +80,9 @@ export type Database = {
           menu_id?: string
           order_id?: string
           quantity?: number
+          sauces?: string[]
           unit_price?: number
+          with_broth?: boolean
         }
         Relationships: [
           {
