@@ -15,6 +15,7 @@ const links = [
 
 export function Navbar() {
   const { user, signOut } = useAuth();
+  const { count, setOpen: setCartOpen } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(true);
