@@ -32,11 +32,10 @@ interface MenuItem {
 const formatRp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 
 export function Menu() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  const cart = useCart();
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [buyingId, setBuyingId] = useState<string | null>(null);
+  const [configItem, setConfigItem] = useState<MenuItem | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -72,42 +71,9 @@ export function Menu() {
     };
   }, []);
 
-  const buy = async (item: MenuItem) => {
-    if (!user) {
-      toast.info("Silakan masuk untuk memesan");
-      navigate({ to: "/auth" });
-      return;
-    }
+  const openBuy = (item: MenuItem) => {
     if (item.stock < 1) return toast.error("Stok habis");
-    setBuyingId(item.id);
-    try {
-      const { data: order, error: oErr } = await supabase
-        .from("orders")
-        .insert({ user_id: user.id, total: item.price, status: "pending" })
-        .select()
-        .single();
-      if (oErr) throw oErr;
-
-      const { error: iErr } = await supabase.from("order_items").insert({
-        order_id: order.id,
-        menu_id: item.id,
-        quantity: 1,
-        unit_price: item.price,
-      });
-      if (iErr) throw iErr;
-
-      const { error: sErr } = await supabase
-        .from("menu")
-        .update({ stock: item.stock - 1 })
-        .eq("id", item.id);
-      if (sErr) throw sErr;
-
-      toast.success(`${item.name} berhasil dipesan! 🔥`);
-    } catch (e: any) {
-      toast.error(e.message ?? "Gagal memesan");
-    } finally {
-      setBuyingId(null);
-    }
+    setConfigItem(item);
   };
 
   return (
