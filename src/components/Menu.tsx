@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 import { ShoppingBag, Package, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/use-auth";
-import { useNavigate } from "@tanstack/react-router";
+import { useCart } from "@/hooks/use-cart";
+import { ConfigDialog } from "@/components/ConfigDialog";
 import pentolIkan from "@/assets/pentol-ikan.jpg";
 import pentolDaging from "@/assets/pentol-daging.jpg";
 import siomay from "@/assets/siomay.jpg";
@@ -32,11 +32,10 @@ interface MenuItem {
 const formatRp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 
 export function Menu() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  const cart = useCart();
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [buyingId, setBuyingId] = useState<string | null>(null);
+  const [configItem, setConfigItem] = useState<MenuItem | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -72,42 +71,9 @@ export function Menu() {
     };
   }, []);
 
-  const buy = async (item: MenuItem) => {
-    if (!user) {
-      toast.info("Silakan masuk untuk memesan");
-      navigate({ to: "/auth" });
-      return;
-    }
+  const openBuy = (item: MenuItem) => {
     if (item.stock < 1) return toast.error("Stok habis");
-    setBuyingId(item.id);
-    try {
-      const { data: order, error: oErr } = await supabase
-        .from("orders")
-        .insert({ user_id: user.id, total: item.price, status: "pending" })
-        .select()
-        .single();
-      if (oErr) throw oErr;
-
-      const { error: iErr } = await supabase.from("order_items").insert({
-        order_id: order.id,
-        menu_id: item.id,
-        quantity: 1,
-        unit_price: item.price,
-      });
-      if (iErr) throw iErr;
-
-      const { error: sErr } = await supabase
-        .from("menu")
-        .update({ stock: item.stock - 1 })
-        .eq("id", item.id);
-      if (sErr) throw sErr;
-
-      toast.success(`${item.name} berhasil dipesan! 🔥`);
-    } catch (e: any) {
-      toast.error(e.message ?? "Gagal memesan");
-    } finally {
-      setBuyingId(null);
-    }
+    setConfigItem(item);
   };
 
   return (
@@ -178,11 +144,11 @@ export function Menu() {
                       Stok: <span className={`font-medium ${out ? "text-destructive" : "text-foreground"}`}>{out ? "Habis" : `${item.stock} pcs`}</span>
                     </p>
                     <button
-                      onClick={() => buy(item)}
-                      disabled={buyingId === item.id || out}
+                      onClick={() => openBuy(item)}
+                      disabled={out}
                       className="mt-auto inline-flex items-center justify-center gap-2 w-full py-3 rounded-2xl bg-gradient-flame text-primary-foreground font-semibold hover:glow-flame transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
                     >
-                      {buyingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingBag className="h-4 w-4" />}
+                      <ShoppingBag className="h-4 w-4" />
                       {out ? "Stok Habis" : "Beli Sekarang"}
                     </button>
                   </div>
@@ -192,6 +158,30 @@ export function Menu() {
           </div>
         )}
       </div>
+
+      {configItem && (
+        <ConfigDialog
+          open={!!configItem}
+          onClose={() => setConfigItem(null)}
+          itemName={configItem.name}
+          itemImage={imageMap[configItem.image_key ?? ""] ?? pentolIkan}
+          price={configItem.price}
+          onConfirm={({ sauces, withBroth, quantity }) => {
+            cart.add({
+              menuId: configItem.id,
+              name: configItem.name,
+              image: imageMap[configItem.image_key ?? ""] ?? pentolIkan,
+              price: configItem.price,
+              quantity,
+              sauces,
+              withBroth,
+            });
+            toast.success(`${configItem.name} ditambah ke keranjang`);
+            setConfigItem(null);
+            cart.setOpen(true);
+          }}
+        />
+      )}
     </section>
   );
 }

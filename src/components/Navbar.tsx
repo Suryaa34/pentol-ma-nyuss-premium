@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Moon, Sun, Menu, X, LogOut, User as UserIcon } from "lucide-react";
+import { Moon, Sun, Menu, X, LogOut, User as UserIcon, ShoppingCart } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/use-auth";
+import { useCart } from "@/hooks/use-cart";
 import logo from "@/assets/logo.png";
 
 const links = [
@@ -14,6 +15,7 @@ const links = [
 
 export function Navbar() {
   const { user, signOut } = useAuth();
+  const { count, setOpen: setCartOpen } = useCart();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [dark, setDark] = useState(true);
@@ -54,6 +56,18 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCartOpen(true)}
+              className="relative h-10 w-10 grid place-items-center rounded-xl glass hover:glow-flame transition-all"
+              aria-label="Keranjang"
+            >
+              <ShoppingCart className="h-4 w-4" />
+              {count > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 h-5 min-w-5 px-1 grid place-items-center rounded-full bg-gradient-flame text-primary-foreground text-[10px] font-bold glow-flame">
+                  {count}
+                </span>
+              )}
+            </button>
             <button
               onClick={() => setDark((d) => !d)}
               className="h-10 w-10 grid place-items-center rounded-xl glass hover:glow-flame transition-all"
