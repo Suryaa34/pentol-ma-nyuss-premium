@@ -158,6 +158,30 @@ export function Menu() {
           </div>
         )}
       </div>
+
+      {configItem && (
+        <ConfigDialog
+          open={!!configItem}
+          onClose={() => setConfigItem(null)}
+          itemName={configItem.name}
+          itemImage={imageMap[configItem.image_key ?? ""] ?? pentolIkan}
+          price={configItem.price}
+          onConfirm={({ sauces, withBroth, quantity }) => {
+            cart.add({
+              menuId: configItem.id,
+              name: configItem.name,
+              image: imageMap[configItem.image_key ?? ""] ?? pentolIkan,
+              price: configItem.price,
+              quantity,
+              sauces,
+              withBroth,
+            });
+            toast.success(`${configItem.name} ditambah ke keranjang`);
+            setConfigItem(null);
+            cart.setOpen(true);
+          }}
+        />
+      )}
     </section>
   );
 }
