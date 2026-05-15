@@ -6,6 +6,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCart, SAUCE_OPTIONS } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { CheckoutDialog, CheckoutForm } from "./CheckoutDialog";
 
 const formatRp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 
@@ -17,8 +18,20 @@ export function CartDrawer() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const [formOpen, setFormOpen] = useState(false);
 
-  const checkout = async () => {
+  const openCheckout = () => {
+    if (items.length === 0) return;
+    if (!user) {
+      toast.info("Silakan masuk untuk melanjutkan");
+      setOpen(false);
+      navigate({ to: "/auth" });
+      return;
+    }
+    setFormOpen(true);
+  };
+
+  const checkout = async (form: CheckoutForm) => {
     if (items.length === 0) return;
     if (!user) {
       toast.info("Silakan masuk untuk melanjutkan");
@@ -30,7 +43,14 @@ export function CartDrawer() {
     try {
       const { data: order, error: oErr } = await supabase
         .from("orders")
-        .insert({ user_id: user.id, total, status: "pending" })
+        .insert({
+          user_id: user!.id,
+          total,
+          status: "pending",
+          buyer_name: form.buyerName,
+          buyer_whatsapp: form.buyerWhatsapp,
+          notes: form.notes,
+        })
         .select()
         .single();
       if (oErr) throw oErr;
@@ -46,7 +66,6 @@ export function CartDrawer() {
       const { error: iErr } = await supabase.from("order_items").insert(rows);
       if (iErr) throw iErr;
 
-      // decrement stock per menu_id
       const grouped = new Map<string, number>();
       items.forEach((i) => grouped.set(i.menuId, (grouped.get(i.menuId) ?? 0) + i.quantity));
       for (const [menuId, qty] of grouped) {
@@ -54,8 +73,9 @@ export function CartDrawer() {
         if (m) await supabase.from("menu").update({ stock: Math.max(0, m.stock - qty) }).eq("id", menuId);
       }
 
-      toast.success("Pesanan berhasil dibuat! 🔥");
+      toast.success(`Pesanan ${order.order_number ?? ""} berhasil dibuat! 🔥`);
       clear();
+      setFormOpen(false);
       setOpen(false);
     } catch (e: any) {
       toast.error(e.message ?? "Gagal checkout");
@@ -180,16 +200,23 @@ export function CartDrawer() {
                   <span className="text-gradient-flame">{formatRp(total)}</span>
                 </div>
                 <button
-                  onClick={checkout}
+                  onClick={openCheckout}
                   disabled={submitting}
                   className="w-full py-3.5 rounded-2xl bg-gradient-flame text-primary-foreground font-semibold hover:glow-flame transition-all hover:scale-[1.02] disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShoppingBag className="h-4 w-4" />}
-                  Pesan Sekarang
+                  Lanjut Checkout
                 </button>
               </div>
             )}
           </motion.aside>
+          <CheckoutDialog
+            open={formOpen}
+            onClose={() => !submitting && setFormOpen(false)}
+            onSubmit={checkout}
+            total={total}
+            submitting={submitting}
+          />
         </>
       )}
     </AnimatePresence>
