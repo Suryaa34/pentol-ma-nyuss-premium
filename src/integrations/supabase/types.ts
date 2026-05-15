@@ -103,27 +103,36 @@ export type Database = {
       }
       orders: {
         Row: {
+          buyer_name: string | null
+          buyer_whatsapp: string | null
           created_at: string
           id: string
           notes: string | null
+          order_number: string | null
           status: Database["public"]["Enums"]["order_status"]
           total: number
           updated_at: string
           user_id: string
         }
         Insert: {
+          buyer_name?: string | null
+          buyer_whatsapp?: string | null
           created_at?: string
           id?: string
           notes?: string | null
+          order_number?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           total?: number
           updated_at?: string
           user_id: string
         }
         Update: {
+          buyer_name?: string | null
+          buyer_whatsapp?: string | null
           created_at?: string
           id?: string
           notes?: string | null
+          order_number?: string | null
           status?: Database["public"]["Enums"]["order_status"]
           total?: number
           updated_at?: string
