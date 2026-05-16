@@ -270,18 +270,28 @@ export function CartDrawer() {
             total={total}
             submitting={submitting}
           />
-          <QrisDialog
-            open={qrisOpen}
-            total={paidTotal}
-            submitting={submitting}
-            success={paySuccess}
-            orderNumber={orderNumber}
-            onPaid={confirmPaid}
-            onCancel={cancelPayment}
-            onClose={closeSuccess}
-          />
         </>
       )}
+      <QrisDialog
+        open={qrisOpen}
+        total={paidTotal}
+        submitting={submitting}
+        success={paySuccess}
+        orderNumber={orderNumber}
+        onPaid={confirmPaid}
+        onCancel={cancelPayment}
+        onClose={closeSuccess}
+        onShowReceipt={showReceipt}
+      />
+      <ReceiptDialog
+        open={receiptOpen}
+        onClose={closeReceipt}
+        orderNumber={orderNumber}
+        form={pendingForm}
+        items={paidItems}
+        total={paidTotal}
+        paidAt={paidAt}
+      />
     </AnimatePresence>
   );
 }
