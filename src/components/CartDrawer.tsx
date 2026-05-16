@@ -7,6 +7,7 @@ import { useCart, SAUCE_OPTIONS } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckoutDialog, CheckoutForm } from "./CheckoutDialog";
+import { QrisDialog } from "./QrisDialog";
 
 const formatRp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 
@@ -19,6 +20,11 @@ export function CartDrawer() {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+  const [qrisOpen, setQrisOpen] = useState(false);
+  const [paySuccess, setPaySuccess] = useState(false);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [pendingForm, setPendingForm] = useState<CheckoutForm | null>(null);
+  const [paidTotal, setPaidTotal] = useState(0);
 
   const openCheckout = () => {
     if (items.length === 0) return;
@@ -31,25 +37,28 @@ export function CartDrawer() {
     setFormOpen(true);
   };
 
-  const checkout = async (form: CheckoutForm) => {
-    if (items.length === 0) return;
-    if (!user) {
-      toast.info("Silakan masuk untuk melanjutkan");
-      setOpen(false);
-      navigate({ to: "/auth" });
-      return;
-    }
+  const handleFormSubmit = (form: CheckoutForm) => {
+    setPendingForm(form);
+    setPaidTotal(total);
+    setFormOpen(false);
+    setPaySuccess(false);
+    setOrderNumber(null);
+    setQrisOpen(true);
+  };
+
+  const confirmPaid = async () => {
+    if (!pendingForm || !user || items.length === 0) return;
     setSubmitting(true);
     try {
       const { data: order, error: oErr } = await supabase
         .from("orders")
         .insert({
-          user_id: user!.id,
-          total,
-          status: "pending",
-          buyer_name: form.buyerName,
-          buyer_whatsapp: form.buyerWhatsapp,
-          notes: form.notes,
+          user_id: user.id,
+          total: paidTotal,
+          status: "paid",
+          buyer_name: pendingForm.buyerName,
+          buyer_whatsapp: pendingForm.buyerWhatsapp,
+          notes: pendingForm.notes,
         })
         .select()
         .single();
@@ -66,6 +75,13 @@ export function CartDrawer() {
       const { error: iErr } = await supabase.from("order_items").insert(rows);
       if (iErr) throw iErr;
 
+      await supabase.from("transactions").insert({
+        order_id: order.id,
+        amount: paidTotal,
+        method: "qris",
+        status: "success",
+      });
+
       const grouped = new Map<string, number>();
       items.forEach((i) => grouped.set(i.menuId, (grouped.get(i.menuId) ?? 0) + i.quantity));
       for (const [menuId, qty] of grouped) {
@@ -73,15 +89,29 @@ export function CartDrawer() {
         if (m) await supabase.from("menu").update({ stock: Math.max(0, m.stock - qty) }).eq("id", menuId);
       }
 
-      toast.success(`Pesanan ${order.order_number ?? ""} berhasil dibuat! 🔥`);
+      setOrderNumber(order.order_number ?? null);
+      setPaySuccess(true);
       clear();
-      setFormOpen(false);
-      setOpen(false);
     } catch (e: any) {
-      toast.error(e.message ?? "Gagal checkout");
+      toast.error(e.message ?? "Gagal memproses pembayaran");
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const cancelPayment = () => {
+    if (submitting) return;
+    setQrisOpen(false);
+    setPendingForm(null);
+    toast.info("Pembayaran dibatalkan");
+  };
+
+  const closeSuccess = () => {
+    setQrisOpen(false);
+    setPaySuccess(false);
+    setOrderNumber(null);
+    setPendingForm(null);
+    setOpen(false);
   };
 
   return (
@@ -213,9 +243,19 @@ export function CartDrawer() {
           <CheckoutDialog
             open={formOpen}
             onClose={() => !submitting && setFormOpen(false)}
-            onSubmit={checkout}
+            onSubmit={handleFormSubmit}
             total={total}
             submitting={submitting}
+          />
+          <QrisDialog
+            open={qrisOpen}
+            total={paidTotal}
+            submitting={submitting}
+            success={paySuccess}
+            orderNumber={orderNumber}
+            onPaid={confirmPaid}
+            onCancel={cancelPayment}
+            onClose={closeSuccess}
           />
         </>
       )}
