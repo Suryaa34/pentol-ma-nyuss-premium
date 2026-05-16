@@ -163,3 +163,23 @@
   font-weight: 100 900;
   font-display: swap;
 }
+
+@media print {
+  body * { visibility: hidden !important; }
+  #print-receipt, #print-receipt * { visibility: visible !important; }
+  #print-receipt {
+    position: fixed !important;
+    inset: 0 !important;
+    background: white !important;
+    color: black !important;
+    padding: 12px !important;
+    width: 80mm !important;
+    margin: 0 auto !important;
+    font-family: "Courier New", ui-monospace, monospace !important;
+    font-size: 12px !important;
+    z-index: 9999 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  @page { size: 80mm auto; margin: 4mm; }
+}

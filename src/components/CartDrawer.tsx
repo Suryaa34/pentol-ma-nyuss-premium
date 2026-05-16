@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash2, Minus, Plus, ShoppingBag, Loader2, Soup } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
-import { useCart, SAUCE_OPTIONS } from "@/hooks/use-cart";
+import { useCart, SAUCE_OPTIONS, CartItem } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckoutDialog, CheckoutForm } from "./CheckoutDialog";
 import { QrisDialog } from "./QrisDialog";
+import { ReceiptDialog } from "./ReceiptDialog";
 
 const formatRp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 
@@ -25,6 +26,9 @@ export function CartDrawer() {
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [pendingForm, setPendingForm] = useState<CheckoutForm | null>(null);
   const [paidTotal, setPaidTotal] = useState(0);
+  const [paidItems, setPaidItems] = useState<CartItem[]>([]);
+  const [paidAt, setPaidAt] = useState<Date | null>(null);
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   const openCheckout = () => {
     if (items.length === 0) return;
@@ -90,6 +94,8 @@ export function CartDrawer() {
       }
 
       setOrderNumber(order.order_number ?? null);
+      setPaidItems(items);
+      setPaidAt(new Date());
       setPaySuccess(true);
       clear();
     } catch (e: any) {
@@ -111,6 +117,23 @@ export function CartDrawer() {
     setPaySuccess(false);
     setOrderNumber(null);
     setPendingForm(null);
+    setPaidItems([]);
+    setPaidAt(null);
+    setOpen(false);
+  };
+
+  const showReceipt = () => {
+    setQrisOpen(false);
+    setReceiptOpen(true);
+  };
+
+  const closeReceipt = () => {
+    setReceiptOpen(false);
+    setPaySuccess(false);
+    setOrderNumber(null);
+    setPendingForm(null);
+    setPaidItems([]);
+    setPaidAt(null);
     setOpen(false);
   };
 
@@ -247,18 +270,28 @@ export function CartDrawer() {
             total={total}
             submitting={submitting}
           />
-          <QrisDialog
-            open={qrisOpen}
-            total={paidTotal}
-            submitting={submitting}
-            success={paySuccess}
-            orderNumber={orderNumber}
-            onPaid={confirmPaid}
-            onCancel={cancelPayment}
-            onClose={closeSuccess}
-          />
         </>
       )}
+      <QrisDialog
+        open={qrisOpen}
+        total={paidTotal}
+        submitting={submitting}
+        success={paySuccess}
+        orderNumber={orderNumber}
+        onPaid={confirmPaid}
+        onCancel={cancelPayment}
+        onClose={closeSuccess}
+        onShowReceipt={showReceipt}
+      />
+      <ReceiptDialog
+        open={receiptOpen}
+        onClose={closeReceipt}
+        orderNumber={orderNumber}
+        form={pendingForm}
+        items={paidItems}
+        total={paidTotal}
+        paidAt={paidAt}
+      />
     </AnimatePresence>
   );
 }
