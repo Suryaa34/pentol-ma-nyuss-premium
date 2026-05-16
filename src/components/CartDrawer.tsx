@@ -117,6 +117,23 @@ export function CartDrawer() {
     setPaySuccess(false);
     setOrderNumber(null);
     setPendingForm(null);
+    setPaidItems([]);
+    setPaidAt(null);
+    setOpen(false);
+  };
+
+  const showReceipt = () => {
+    setQrisOpen(false);
+    setReceiptOpen(true);
+  };
+
+  const closeReceipt = () => {
+    setReceiptOpen(false);
+    setPaySuccess(false);
+    setOrderNumber(null);
+    setPendingForm(null);
+    setPaidItems([]);
+    setPaidAt(null);
     setOpen(false);
   };
 
