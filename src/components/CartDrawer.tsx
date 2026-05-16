@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, Trash2, Minus, Plus, ShoppingBag, Loader2, Soup } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
-import { useCart, SAUCE_OPTIONS } from "@/hooks/use-cart";
+import { useCart, SAUCE_OPTIONS, CartItem } from "@/hooks/use-cart";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { CheckoutDialog, CheckoutForm } from "./CheckoutDialog";
 import { QrisDialog } from "./QrisDialog";
+import { ReceiptDialog } from "./ReceiptDialog";
 
 const formatRp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 
