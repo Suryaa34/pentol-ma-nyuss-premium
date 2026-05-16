@@ -26,6 +26,9 @@ export function CartDrawer() {
   const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [pendingForm, setPendingForm] = useState<CheckoutForm | null>(null);
   const [paidTotal, setPaidTotal] = useState(0);
+  const [paidItems, setPaidItems] = useState<CartItem[]>([]);
+  const [paidAt, setPaidAt] = useState<Date | null>(null);
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   const openCheckout = () => {
     if (items.length === 0) return;
