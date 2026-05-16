@@ -13,6 +13,7 @@ interface Props {
   onPaid: () => Promise<void> | void;
   onCancel: () => void;
   onClose: () => void;
+  onShowReceipt?: () => void;
 }
 
 const formatRp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
