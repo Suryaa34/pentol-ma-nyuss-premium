@@ -243,12 +243,22 @@ export function QrisDialog({
                       {formatRp(total)}
                     </span>
                   </div>
-                  <button
-                    onClick={onClose}
-                    className="w-full py-3 rounded-2xl bg-gradient-flame text-primary-foreground font-semibold hover:glow-flame transition-all hover:scale-[1.02] text-sm"
-                  >
-                    Selesai
-                  </button>
+                  <div className="grid grid-cols-2 gap-2">
+                    {onShowReceipt && (
+                      <button
+                        onClick={onShowReceipt}
+                        className="py-3 rounded-2xl glass border border-border/40 font-semibold hover:bg-secondary/40 transition-colors text-sm"
+                      >
+                        Lihat Struk
+                      </button>
+                    )}
+                    <button
+                      onClick={onClose}
+                      className={`py-3 rounded-2xl bg-gradient-flame text-primary-foreground font-semibold hover:glow-flame transition-all hover:scale-[1.02] text-sm ${onShowReceipt ? "" : "col-span-2"}`}
+                    >
+                      Selesai
+                    </button>
+                  </div>
                 </div>
               )}
             </motion.div>
