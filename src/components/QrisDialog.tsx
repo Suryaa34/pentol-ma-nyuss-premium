@@ -28,6 +28,7 @@ export function QrisDialog({
   onPaid,
   onCancel,
   onClose,
+  onShowReceipt,
 }: Props) {
   const [left, setLeft] = useState(PAY_SECONDS);
   const startedAt = useRef<number | null>(null);
