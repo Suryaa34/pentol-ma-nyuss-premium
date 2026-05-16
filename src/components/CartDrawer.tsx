@@ -94,6 +94,8 @@ export function CartDrawer() {
       }
 
       setOrderNumber(order.order_number ?? null);
+      setPaidItems(items);
+      setPaidAt(new Date());
       setPaySuccess(true);
       clear();
     } catch (e: any) {
