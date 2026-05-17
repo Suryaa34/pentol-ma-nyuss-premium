@@ -5,6 +5,7 @@ import { Menu } from "@/components/Menu";
 import { About } from "@/components/About";
 import { Footer } from "@/components/Footer";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
+import { ReviewsSection } from "@/components/ReviewsSection";
 import { Loader } from "@/components/Loader";
 
 export const Route = createFileRoute("/")({
