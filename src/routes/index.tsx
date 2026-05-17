@@ -27,6 +27,7 @@ function Index() {
         <Hero />
         <About />
         <Menu />
+        <ReviewsSection />
       </main>
       <Footer />
       <WhatsAppButton />
