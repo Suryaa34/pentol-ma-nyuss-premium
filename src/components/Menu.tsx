@@ -157,6 +157,13 @@ export function Menu() {
                         {formatRp(item.price)}
                       </p>
                     </div>
+                    {ratings[item.id] && (
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <Star className="h-3.5 w-3.5 fill-amber-400 stroke-amber-400" />
+                        <span className="font-semibold">{ratings[item.id].avg.toFixed(1)}</span>
+                        <span className="text-muted-foreground">({ratings[item.id].count} ulasan)</span>
+                      </div>
+                    )}
                     <p className="text-sm text-muted-foreground">
                       Stok: <span className={`font-medium ${out ? "text-destructive" : "text-foreground"}`}>{out ? "Habis" : `${item.stock} pcs`}</span>
                     </p>
