@@ -201,24 +201,30 @@ export type Database = {
       }
       reviews: {
         Row: {
-          content: string
+          content: string | null
           created_at: string
           id: string
           menu_id: string
+          photo_url: string | null
+          rating: number
           user_id: string
         }
         Insert: {
-          content: string
+          content?: string | null
           created_at?: string
           id?: string
           menu_id: string
+          photo_url?: string | null
+          rating?: number
           user_id: string
         }
         Update: {
-          content?: string
+          content?: string | null
           created_at?: string
           id?: string
           menu_id?: string
+          photo_url?: string | null
+          rating?: number
           user_id?: string
         }
         Relationships: [
@@ -292,6 +298,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_purchased_menu: {
+        Args: { _menu_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
