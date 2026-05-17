@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ShoppingBag, Package, Loader2 } from "lucide-react";
+import { ShoppingBag, Package, Loader2, Star } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useCart } from "@/hooks/use-cart";
@@ -36,6 +36,23 @@ export function Menu() {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [configItem, setConfigItem] = useState<MenuItem | null>(null);
+  const [ratings, setRatings] = useState<Record<string, { avg: number; count: number }>>({});
+
+  useEffect(() => {
+    const loadRatings = async () => {
+      const { data } = await supabase.from("reviews").select("menu_id, rating");
+      const map: Record<string, { sum: number; count: number }> = {};
+      (data ?? []).forEach((r: any) => {
+        map[r.menu_id] = map[r.menu_id] ?? { sum: 0, count: 0 };
+        map[r.menu_id].sum += r.rating;
+        map[r.menu_id].count++;
+      });
+      setRatings(Object.fromEntries(Object.entries(map).map(([k, v]) => [k, { avg: v.sum / v.count, count: v.count }])));
+    };
+    loadRatings();
+    const ch = supabase.channel("menu-ratings").on("postgres_changes", { event: "*", schema: "public", table: "reviews" }, loadRatings).subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -140,6 +157,13 @@ export function Menu() {
                         {formatRp(item.price)}
                       </p>
                     </div>
+                    {ratings[item.id] && (
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <Star className="h-3.5 w-3.5 fill-amber-400 stroke-amber-400" />
+                        <span className="font-semibold">{ratings[item.id].avg.toFixed(1)}</span>
+                        <span className="text-muted-foreground">({ratings[item.id].count} ulasan)</span>
+                      </div>
+                    )}
                     <p className="text-sm text-muted-foreground">
                       Stok: <span className={`font-medium ${out ? "text-destructive" : "text-foreground"}`}>{out ? "Habis" : `${item.stock} pcs`}</span>
                     </p>

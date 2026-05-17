@@ -149,6 +149,17 @@
   .glow-flame {
     box-shadow: 0 0 40px -8px var(--flame);
   }
+
+  .input {
+    width: 100%;
+    border-radius: 0.75rem;
+    background: oklch(0.2 0.02 25 / 0.4);
+    border: 1px solid var(--color-border);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--color-foreground);
+  }
+  .input:focus { outline: none; border-color: var(--color-primary); }
 }
 
 @font-face {
