@@ -81,6 +81,11 @@ export function Navbar() {
 
             {user ? (
               <div className="hidden md:flex items-center gap-2">
+                {isAdmin && (
+                  <Link to="/admin" className="inline-flex items-center gap-1.5 glass px-3 py-2 rounded-xl text-xs font-semibold hover:glow-flame transition-all">
+                    <Crown className="h-3.5 w-3.5 text-amber-400" /> Admin
+                  </Link>
+                )}
                 <div className="flex items-center gap-2 glass px-3 py-2 rounded-xl">
                   <UserIcon className="h-4 w-4 text-primary" />
                   <span className="text-xs font-medium max-w-[140px] truncate">{user.email}</span>
