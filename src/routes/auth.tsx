@@ -31,12 +31,15 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "login") {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        console.log("[Auth] signInWithPassword →", { email });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        console.log("[Auth] login result:", { user: data?.user?.id, session: !!data?.session, error });
         if (error) throw error;
         toast.success("Selamat datang kembali! 🔥");
         navigate({ to: "/" });
       } else if (mode === "register") {
-        const { error } = await supabase.auth.signUp({
+        console.log("[Auth] signUp →", { email, name });
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -44,9 +47,17 @@ function AuthPage() {
             data: { full_name: name },
           },
         });
+        console.log("[Auth] signup result:", { user: data?.user?.id, session: !!data?.session, error });
         if (error) throw error;
-        toast.success("Akun dibuat! Cek email untuk konfirmasi.");
+        if (data.session) {
+          toast.success("Akun dibuat & langsung masuk! 🔥");
+          navigate({ to: "/" });
+        } else {
+          toast.success("Akun dibuat! Silakan login.");
+          setMode("login");
+        }
       } else {
+        console.log("[Auth] resetPasswordForEmail →", { email });
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
@@ -55,7 +66,8 @@ function AuthPage() {
         setMode("login");
       }
     } catch (err: any) {
-      toast.error(err.message ?? "Terjadi kesalahan");
+      console.error("[Auth] error:", err);
+      toast.error(err?.message ?? "Terjadi kesalahan");
     } finally {
       setLoading(false);
     }
