@@ -98,6 +98,23 @@ export function CartDrawer() {
       setPaidItems(items);
       setPaidAt(new Date());
       setPaySuccess(true);
+
+      // Log to Google Sheets (non-blocking, don't fail the payment if it errors)
+      logTransactionToSheet({
+        data: {
+          orderNumber: order.order_number ?? order.id,
+          buyerName: pendingForm.buyerName,
+          buyerWhatsapp: pendingForm.buyerWhatsapp,
+          total: paidTotal,
+          items: items.map((i) => ({
+            name: i.name,
+            quantity: i.quantity,
+            sauces: i.sauces.map(sauceLabel),
+            withBroth: i.withBroth,
+          })),
+        },
+      }).catch((err) => console.error("Sheets log failed:", err));
+
       clear();
     } catch (e: any) {
       toast.error(e.message ?? "Gagal memproses pembayaran");
