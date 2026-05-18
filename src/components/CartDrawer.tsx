@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CheckoutDialog, CheckoutForm } from "./CheckoutDialog";
 import { QrisDialog } from "./QrisDialog";
 import { ReceiptDialog } from "./ReceiptDialog";
+import { logTransactionToSheet } from "@/lib/sheets.functions";
 
 const formatRp = (n: number) => `Rp ${n.toLocaleString("id-ID")}`;
 
