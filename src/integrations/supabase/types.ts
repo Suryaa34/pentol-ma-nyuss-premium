@@ -237,6 +237,41 @@ export type Database = {
           },
         ]
       }
+      stock_logs: {
+        Row: {
+          change: number
+          created_at: string
+          id: string
+          menu_id: string
+          reason: string | null
+          user_id: string | null
+        }
+        Insert: {
+          change: number
+          created_at?: string
+          id?: string
+          menu_id: string
+          reason?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          change?: number
+          created_at?: string
+          id?: string
+          menu_id?: string
+          reason?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_logs_menu_id_fkey"
+            columns: ["menu_id"]
+            isOneToOne: false
+            referencedRelation: "menu"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transactions: {
         Row: {
           amount: number
